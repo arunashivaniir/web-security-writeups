@@ -8,3 +8,5 @@ Each writeup includes:
 - Exploitation logic
 - Root cause analysis
 - Practical remediation steps
+
+Including writeups of CTF challenges.
