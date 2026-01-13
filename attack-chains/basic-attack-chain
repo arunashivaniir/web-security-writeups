@@ -1,0 +1,14 @@
+EXAMPLE ATTACK CHAIN USING ACCESS CONTROL, IDOR, NoSQL INJECTION
+(OWASP)
+
+1.INITIAL FOOTHOLD
+The attack starts with a missing function-level authorisation that allows a normal users to access backend functionality(/api/Challenges), without role validation.
+
+2.PRIVILEGE EXPANSION
+IDOR vulnerability allow access to other users' data by manipulating object identifiers, without ownership checks.
+
+3.Impact Escalation
+NoSQL injection in the authentication endpoint allows corruption of authentication logic and backend instability, amplifying the impact of exposed functionality and enabling further abuse such as denial of service or user enumeration.
+
+4.Breaking the Chain
+The attack chain can be effectively prevented by enforcing strict server-side authorization (function-level and object-level). While input validation mitigates injection, authorization failures must be addressed independently to stop escalation.
