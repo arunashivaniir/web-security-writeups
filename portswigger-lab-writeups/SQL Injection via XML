@@ -1,0 +1,18 @@
+Lab: SQL injection with filter bypass via XML encoding
+PRACTITIONER
+
+The goal is to bypass the backend to get credentials from the username and passwords table.
+
+We first observe the HTTP history in burp, we notice POST /product/stock, we send it to repeater
+In the body we find productid and storeid tags,
+In the input field of storeid I passed the union query with one NULL, which returned the number of units and null.
+
+hence, I checked for number of matching columns we turned out to be 1, using query:
+1 UNION SELECT NULL
+But, this return "attack detected" as a response ,so from the hint we use hackverter extension to add tags to the query(hex_entities)
+Now the response is drawn successfully.
+
+Then i replaced NULL with ,
+1 UNION SELECT USERNAME || '-' || PASSWORD FROM USERS
+
+Thereby , revealing the username and its password with string concatenation and logged in using those credentials to solve the lab.
