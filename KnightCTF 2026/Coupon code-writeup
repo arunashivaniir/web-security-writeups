@@ -1,0 +1,51 @@
+### Knight Shop Again — Writeup (with my trials)
+
+**Goal:** Buy items even though balance was only **$50** and cart total was higher → checkout failed with **“Insufficient balance”**.
+
+**1) Recon (Burp)**
+Captured checkout request:
+
+```http
+POST /api/checkout
+{"discountCode":"","discountCount":0}
+```
+
+So discount depends on **discountCode + discountCount**.
+
+**2) Failed trials**
+
+* Tried forcing huge discount:
+
+```json
+{"discountCode":"ANY","discountCount":500}
+```
+
+Still got **400 Insufficient balance** (backend didn’t accept/benefit from large values).
+
+* Thought it was price tampering because `/api/cart` request had `"price":0.00` but price didn’t change.
+  Verified with:
+
+```http
+GET /api/cart
+```
+
+It still returned real price **89.99**, so backend recalculates price from DB.
+
+**3) Finding real coupon**
+Checked frontend JS bundle `main.bsdygf...` and found coupon validation using ASCII arrays:
+
+* `[75,78,73,71,72,84]` → **KNIGHT**
+* `[50,53]` → **25**
+
+Valid coupon: **KNIGHT25**
+
+**4) Exploit**
+Coupon validation was **client-side**, and “Apply” just increments:
+
+```js
+discountCount = discountCount + 1  // 25% each time
+```
+
+So applying it multiple times reduces total enough to checkout.
+
+**Result:** Checkout succeeds and the response returns the flag in `data.flag`.
