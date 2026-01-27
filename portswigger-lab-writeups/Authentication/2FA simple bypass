@@ -1,0 +1,22 @@
+Lab: 2FA simple bypass
+
+This lab's two-factor authentication can be bypassed. You have already obtained a valid username and password, but do not have access to the user's 2FA verification code. To solve the lab, access Carlos's account page.
+
+Your credentials: wiener:peter
+Victim's credentials carlos:montoya
+
+Step 1:
+I logged into my credentials 'wiener:peter' 
+
+Step 2:
+Once it asked for my 4-digit code I checked my client email inbox.
+->In that it had sent me a 4-digit coode which i used to log in.
+
+But when i did the same for the victim's account ,i received no mail.
+Then I logged into my account like earlier and noticed the URL,it was kinda funny
+
+"https://0a57009504abe02e80fbf8f50000004c.web-security-academy.net/my-account?id=wiener"
+Did you see that!!
+
+So finally I changed the id from wiener->carlos 
+AND it worked!!
