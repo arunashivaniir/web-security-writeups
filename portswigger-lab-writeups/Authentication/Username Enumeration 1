@@ -1,0 +1,30 @@
+Lab: Username enumeration via different responses
+This lab is vulnerable to username enumeration and password brute-force attacks. It has an account with a predictable username and password, which can be found in the following wordlists:
+
+Candidate usernames
+Candidate passwords
+To solve the lab,I have to enumerate a valid username, brute-force this user's password, then access their account page.
+
+To solve this lab,
+Step 1:
+Use burp suite proxy to receive and send requests.
+->Login using a random username and password to test
+
+Step 2:
+Send the POST Login request to intruder
+->Highlight the username parameter and click add to add payload.
+
+Step 3:
+Click on Payloads and ensure it is simple list
+->Under payload configuration paste the username list and click 'start attack'.
+->Notice the length of each username, the one which has a greater length than all the other username is the valid username.
+->To verify click on its respons and you can see that it says incorrect password while all others say invalid username.
+
+Step 4:
+Follow the same for password parameter and now look at the status code received , while all the passwords are '200' the valid password says '302'.
+
+Step 5:
+Now use the Valid username and password to login and solve the lab
+
+The credentials I got as valid:-
+accounting:mom
