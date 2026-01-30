@@ -1,0 +1,23 @@
+Authentication Lab
+Username enumeration via response timing
+
+## Vulnerability
+Authentication logic flaw
+
+## Root Cause
+The application trusted 1 as an IP address before fully verifying the header.
+
+## Exploitation
+1. Sent request to /POST/login
+2. Modified and add X-Forwarded-For
+3. Server authenticated without verifying header
+
+FLOW:
+1.I logged using valid credentials,since its a response time based lab i noticed the response time taken and it was 221ms.
+2.It had a IP block when using the same IP for esting credentials, bu it had a IP header vuln as X-Forwarded-For was allowed
+2.Then i experimented changing the credentials and noticed that a lengthier the password for the valid username, the more time it took(e.g.900ms)
+3.Then i used intruder ; Pitchfork attack to modify requests(both Ip and username);and found one username "vagrant" with the maximum response time.
+5.I used the intruder again to verify the password but none turned out to have a status code of 302; in this half state 
+
+I leave the lab unsolved to clear this confusion and come back with more clarity.
+
