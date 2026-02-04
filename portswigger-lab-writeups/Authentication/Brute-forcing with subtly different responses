@@ -1,1 +1,12 @@
+**Lab: Username enumeration via subtly different responses**
 
+This lab was way similar to the previous labs that I worked on, 
+The only difference was that I had to add an error message column using "Grep-catch" which display the message:
+"Invalid username or password"
+
+After the attack, while noticing the extra error column, we observed for value that had a typo mistake like a period somewher.
+and.....There I found one without a period.
+
+Then I used the password list again in intruder as a payload to brute force the passwords which redirected and gave 302 as a response code.
+
+And, this is how i solved this lab!
